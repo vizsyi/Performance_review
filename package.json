@@ -1,6 +1,15 @@
 {
   "name": "performance_review",
   "version": "0.1.0",
+  "description": "Performance review app",
+  "keywords": [
+    "JavaScript",
+    "React",
+    "Node.js"
+  ],
+  "author": "Vizsy, István",
+  "license": "ISC",
+  "main": "index.js",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
@@ -18,6 +27,14 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vizsyi/Performance_review.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vizsyi/Performance_review/issues"
+  },
+  "homepage": "https://github.com/vizsyi/Performance_review#readme",
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -35,5 +52,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "jtest": "^0.0.1"
   }
 }
