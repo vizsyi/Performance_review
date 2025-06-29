@@ -42,12 +42,29 @@ async function writeJsonToS3(filename, jsonData) {
   });
 
   await s3.send(command);
-  console.log("JSON fájl sikeresen elmentve S3-ba.");
+  //console.log("File written to S3:", FOLDER + filename);
 }
 
 //* Data management *//
+async function getEmployeesObj() {
+  return await readJsonFromS3("employee.json");
+}
 
 //* Response functions *//
+// OK 200, 201
+function okResponse(data, statusCode = 200) {
+  return {
+    statusCode: statusCode,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      message: "Ok!",
+      data: data,
+    }),
+  };
+}
+
 // Bad request
 function badRequest(message = "Invalid request") {
   return {
@@ -61,6 +78,19 @@ function badRequest(message = "Invalid request") {
   };
 }
 
+// Conflict 409
+function postConflict() {
+  return {
+    statusCode: 409,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      message: "Object already exists",
+    }),
+  };
+}
+
 //* Serverless server *//
 export const handler = async (event) => {
   const rawPath = event.rawPath || "/";
@@ -70,18 +100,39 @@ export const handler = async (event) => {
 
   try {
     if (dataType === "criterion" && httpMethod === "GET") {
-      const data = await readJsonFromS3("criterion.json");
-      const response = {
-        statusCode: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: "Ok!",
-          data: data,
-        }),
-      };
-      return response;
+      const data = Object.assign(
+        await readJsonFromS3("criterion.json"),
+        await getEmployeesObj()
+      );
+
+      return okResponse(data);
+    } else if (dataType === "employee") {
+      if (httpMethod === "POST") {
+        const parsedBody = JSON.parse(event.body);
+        const empID = parsedBody.employee_id || "";
+        const empName = parsedBody.name || "";
+
+        if (empID === "" || empName === "") {
+          return badRequest("Missing parameters");
+        }
+
+        const employeesObj = await getEmployeesObj();
+
+        if (employeesObj.employees.some((emp) => emp.id === empID)) {
+          return postConflict();
+        }
+
+        const newEmployee = {
+          id: empID,
+          name: empName,
+          is_ready: false,
+        };
+        employeesObj.employees.push(newEmployee);
+        await writeJsonToS3("employee.json", employeesObj);
+
+        return okResponse(newEmployee, 201);
+      }
+      return badRequest("Invalid method");
     } else {
       return badRequest();
     }
