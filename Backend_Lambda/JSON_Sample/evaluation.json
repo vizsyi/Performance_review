@@ -1,0 +1,86 @@
+{
+  "evaluations": [
+    {
+      "employee_id": "a-01",
+      "criteria": [
+        {
+          "criterion_id": "q1",
+          "value": 4
+        },
+        {
+          "criterion_id": "q2",
+          "value": 5
+        },
+        {
+          "criterion_id": "q3",
+          "value": 4
+        },
+        {
+          "criterion_id": "q4",
+          "value": 3
+        },
+        {
+          "criterion_id": "q5",
+          "value": 4
+        },
+        {
+          "criterion_id": "q6",
+          "value": 5
+        },
+        {
+          "criterion_id": "q7",
+          "value": 5
+        },
+        {
+          "criterion_id": "q8",
+          "value": 4
+        },
+        {
+          "criterion_id": "q9",
+          "ignored": true
+        }
+      ]
+    },
+    {
+      "employee_id": "b-02",
+      "criteria": [
+        {
+          "criterion_id": "q1",
+          "value": 4
+        },
+        {
+          "criterion_id": "q2",
+          "value": 5
+        },
+        {
+          "criterion_id": "q3",
+          "value": 0
+        },
+        {
+          "criterion_id": "q4",
+          "value": 0
+        },
+        {
+          "criterion_id": "q5",
+          "value": 2
+        },
+        {
+          "criterion_id": "q6",
+          "value": 5
+        },
+        {
+          "criterion_id": "q7",
+          "value": 0
+        },
+        {
+          "criterion_id": "q8",
+          "value": 0
+        },
+        {
+          "criterion_id": "q9",
+          "value": 0
+        }
+      ]
+    }
+  ]
+}

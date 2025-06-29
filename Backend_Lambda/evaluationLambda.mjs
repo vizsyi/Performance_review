@@ -50,6 +50,10 @@ async function getEmployeesObj() {
   return await readJsonFromS3("employee.json");
 }
 
+async function getEvaluationsObj() {
+  return await readJsonFromS3("evaluation.json");
+}
+
 //* Response functions *//
 // OK 200, 201
 function okResponse(data, statusCode = 200) {
@@ -65,10 +69,21 @@ function okResponse(data, statusCode = 200) {
   };
 }
 
-// Bad request
-function badRequest(message = "Invalid request") {
+// OK 204 No content (Deleted)
+function okNoContentResponse() {
   return {
-    statusCode: 400,
+    statusCode: 204,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: "",
+  };
+}
+
+// Bad request
+function badRequest(statusCode = 400, message = "Invalid request") {
+  return {
+    statusCode: statusCode,
     headers: {
       "Content-Type": "application/json",
     },
@@ -96,6 +111,7 @@ export const handler = async (event) => {
   const rawPath = event.rawPath || "/";
   const routeParams = rawPath.split("/");
   const dataType = (routeParams[1] || "unknown").toLowerCase();
+  const dataID = (routeParams[2] || "").toLowerCase();
   const httpMethod = event.requestContext?.http?.method || "unknown";
 
   try {
@@ -113,17 +129,17 @@ export const handler = async (event) => {
         const empName = parsedBody.name || "";
 
         if (empID === "" || empName === "") {
-          return badRequest("Missing parameters");
+          return badRequest(400, "Missing parameters");
         }
 
         const employeesObj = await getEmployeesObj();
 
-        if (employeesObj.employees.some((emp) => emp.id === empID)) {
+        if (employeesObj.employees.some((emp) => emp.employee_id === empID)) {
           return postConflict();
         }
 
         const newEmployee = {
-          id: empID,
+          employee_id: empID,
           name: empName,
           is_ready: false,
         };
@@ -131,8 +147,34 @@ export const handler = async (event) => {
         await writeJsonToS3("employee.json", employeesObj);
 
         return okResponse(newEmployee, 201);
+      } else if (httpMethod === "DELETE") {
+        if (dataID === "") {
+          return badRequest(400, "Missing parameters");
+        }
+
+        const employeesObj = await getEmployeesObj();
+        let index = employeesObj.employees.findIndex(
+          (emp) => emp.employee_id === dataID
+        );
+        if (index === -1) {
+          return badRequest(404, "Not found:" + employeesObj.employees.length);
+        }
+        employeesObj.employees.splice(index, 1);
+        // Deleting the employee's evaluations
+        const evaluationsObj = await getEvaluationsObj();
+        index = evaluationsObj.evaluations.findIndex(
+          (eva) => eva.employee_id === dataID
+        );
+        if (index !== -1) {
+          evaluationsObj.evaluations.splice(index, 1);
+          await writeJsonToS3("evaluation.json", evaluationsObj);
+        }
+        // Saving the employeesObj, too
+        await writeJsonToS3("employee.json", employeesObj);
+
+        return okNoContentResponse();
       }
-      return badRequest("Invalid method");
+      return badRequest(400, "Invalid method");
     } else {
       return badRequest();
     }
