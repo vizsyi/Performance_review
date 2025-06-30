@@ -22,10 +22,12 @@ This is a full-stack web application for managing employee performance reviews. 
 
 ## 🧪 Development Tools
 
-| Purpose         | Tool(s) Used                  |
-| --------------- | ----------------------------- |
-| Unit Testing    | JTest                         |
-| Code Quality    | ESLint, Prettier              |
-| Task Management | Atlassian Jira                |
-| Documentation   | Atlassian Confluence          |
-| AI Assistance   | ChatGPT, Amazon CodeWhisperer |
+| Purpose         | Tool(s) Used                   |
+| --------------- | ------------------------------ |
+| Unit Testing    | JTest                          |
+| Code Quality    | ESLint, Prettier               |
+| Formating       | Bootsrap                       |
+| Task Management | Atlassian Jira                 |
+| Documentation   | Atlassian Confluence           |
+| AI Assistance   | ChatGPT, Amazon CodeWhisperer, |
+|                 | Amazon Q                       |

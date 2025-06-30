@@ -1,0 +1,29 @@
+{
+  "employees": [
+    {
+      "employee_id": "a-01",
+      "name": "Angyal Anna",
+      "is_ready": true
+    },
+    {
+      "employee_id": "pi-01",
+      "name": "Piros Pityú",
+      "is_ready": false
+    },
+    {
+      "employee_id": "cs-01",
+      "name": "Csiszár Csilla",
+      "is_ready": false
+    },
+    {
+      "employee_id": "cs-02",
+      "name": "Csatár Csaba",
+      "is_ready": false
+    },
+    {
+      "employee_id": "tor",
+      "name": "Töröcsik Ödön",
+      "is_ready": false
+    }
+  ]
+}

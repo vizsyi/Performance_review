@@ -1,0 +1,58 @@
+{
+  "criteria": [
+    {
+      "criterion_id": "q1",
+      "title": "Szakmai felkészültség",
+      "description": "Rendelkezik a munkakör ellátásához szükséges szaktudással. Képes önállóan, hatékonyan dolgozni. Elkötelezett a folyamatos szakmai fejlődés érdekében. Önállóan keresi, kezdeményezi az új ismeretek megszerzésének lehetőségét.",
+      "required": true
+    },
+    {
+      "criterion_id": "q2",
+      "title": "Munkavégzés minősége",
+      "description": "Nagyfokú odafigyeléssel teljesíti feladatait, gondosan ügyel munkájának minőségére. Munkája pontos, alapos. Erőforrásait hatékonyan használja, feladatait megfelelően priorizálja. Határidőket minden esetben betartja. Nyitott az új feladatok iránt. Terhelhető.",
+      "required": true
+    },
+    {
+      "criterion_id": "q3",
+      "title": "Együttműködés",
+      "description": "Képes és hajlandó főnökeivel, társaival és beosztottjaival való együttműködésre. Munkájában lelkiismeretes, lehet rá számítani. Szívesen vállal plusz feladatokat. Nem zárkózik el olyan feladatok elvégzésétől sem, amelyek nem tartoznak szorosan a munkaköri feladatai közé.",
+      "required": true
+    },
+    {
+      "criterion_id": "q4",
+      "title": "Problémamegoldás",
+      "description": "Előrelátóan beazonosítja, meghatározza, illetve jelzi a meglévő vagy potenciális problémákat. A feltárt problémák megoldására javaslatot tesz, illetve aktívan részt vesz a megoldásban. Mindezeket munkájában napi rendszerességgel alkalmazza.",
+      "required": true
+    },
+    {
+      "criterion_id": "q5",
+      "title": "Csapatmunka",
+      "description": "Munkatársaival hatékonyan, és eredményesen, konfliktusok nélkül képes együttműködni. Könnyen beilleszkedik a csapatba, azonosul a csapat céljaival, normáival, szokásaival. Tevékenyen hozzájárul a csapat céljainak eléréséhez. Nyitott mások gondolatai, véleménye iránt. Lépéseket tesz a csapatépítésre, a csapat teljesítményének növelésére.",
+      "required": true
+    },
+    {
+      "criterion_id": "q6",
+      "title": "Kommunikáció",
+      "description": "Munkájában képes világosan, magabiztosan kommunikálni szóban és írásban. Munkatársainak időben és érthetően átadja a szükséges információkat. Figyelmet fordít mások megértésére, tisztázza a kapott információt. Képes hatni másokra, meggyőző módon prezentálja ötleteit. Képes rávenni másokat, hogy változtassák meg véleményüket, viszonyukat valamivel kapcsolatban.",
+      "required": true
+    },
+    {
+      "criterion_id": "q7",
+      "title": "Proaktivitás",
+      "description": "Kezdeményező és tevékeny az egyéni és közös célok elérése érdekében. Előrelátóan cselekszik, felelősségteljes, önmagáért felelősséget vállal. Megoldást kínál a gondokra, nem másoktól vár utasítást, irányítást.",
+      "required": true
+    },
+    {
+      "criterion_id": "q8",
+      "title": "Változáskezelés, rugalmasság",
+      "description": "Munkakörnyezetében rugalmasan alkalmazkodik a változásokhoz. Hajlandó a változások élére állni. Lelkesen fogad minden újítást, a változásokban kínálkozó lehetőséget lát. Nyitott új, a megszokottól eltérő megoldásokra. Kreatív, másokat is újításokra és folyamatos fejlődésre ösztönöz. Képes újrafogalmazni saját elképzeléseit, szakmai terveit, céljait, illetve prioritásit a megváltozott körülményeknek megfelelően.",
+      "required": true
+    },
+    {
+      "criterion_id": "q9",
+      "title": "Vezetés",
+      "description": "(Csak vezetői munkakörben töltendő.) Csapata felé elvárásokat, célokat fogalmaz meg. Hatékony irányítja a munkavégzést, biztosítja a munkavégzéshez szükséges erőforrásokat. Nyomon követi a feladatok megvalósítását, megfelelően delegál. Prioritásokat állít fel. Bátran hoz önálló döntést. Kollégáit fejleszti, motiválja, személyre szabott visszajelzéseket ad. Kollégái tisztelik, személye stabilitást sugároz mások számára is. Megünnepli a sikereket, elismeréseket ad.",
+      "required": false
+    }
+  ]
+}
