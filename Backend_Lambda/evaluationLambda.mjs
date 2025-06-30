@@ -3,7 +3,7 @@ import {
   GetObjectCommand,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
-import { Readable } from "stream";
+//import { Readable } from "stream";
 
 const s3 = new S3Client({ region: "eu-central-1" });
 
@@ -15,7 +15,7 @@ const FOLDER = "evaluation/";
 function streamToString(stream) {
   return new Promise((resolve, reject) => {
     const chunks = [];
-    stream.on("data", (chunk) => chunks.push(chunk));
+    stream.on("data", chunk => chunks.push(chunk));
     stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
     stream.on("error", reject);
   });
@@ -42,7 +42,7 @@ async function writeJsonToS3(filename, jsonData) {
   });
 
   await s3.send(command);
-  //console.log("File written to S3:", FOLDER + filename);
+  console.log("File written to S3:", FOLDER + filename);
 }
 
 //* Data management *//
@@ -107,7 +107,7 @@ function postConflict() {
 }
 
 //* Serverless server *//
-export const handler = async (event) => {
+export const handler = async event => {
   const rawPath = event.rawPath || "/";
   const routeParams = rawPath.split("/");
   const dataType = (routeParams[1] || "unknown").toLowerCase();
@@ -115,31 +115,34 @@ export const handler = async (event) => {
   const httpMethod = event.requestContext?.http?.method || "unknown";
 
   try {
+    // Criterion
     if (dataType === "criterion" && httpMethod === "GET") {
       const data = Object.assign(
         await readJsonFromS3("criterion.json"),
         await getEmployeesObj()
       );
-
       return okResponse(data);
+      // Employee //
     } else if (dataType === "employee") {
       if (httpMethod === "POST") {
         const parsedBody = JSON.parse(event.body);
-        const empID = parsedBody.employee_id || "";
+        const employee_id = parsedBody.employee_id || "";
         const empName = parsedBody.name || "";
 
-        if (empID === "" || empName === "") {
+        if (employee_id === "" || empName === "") {
           return badRequest(400, "Missing parameters");
         }
 
         const employeesObj = await getEmployeesObj();
 
-        if (employeesObj.employees.some((emp) => emp.employee_id === empID)) {
+        if (
+          employeesObj.employees.some(emp => emp.employee_id === employee_id)
+        ) {
           return postConflict();
         }
 
         const newEmployee = {
-          employee_id: empID,
+          employee_id: employee_id,
           name: empName,
           is_ready: false,
         };
@@ -154,16 +157,16 @@ export const handler = async (event) => {
 
         const employeesObj = await getEmployeesObj();
         let index = employeesObj.employees.findIndex(
-          (emp) => emp.employee_id === dataID
+          emp => emp.employee_id === dataID
         );
         if (index === -1) {
-          return badRequest(404, "Not found:" + employeesObj.employees.length);
+          return badRequest(404, "Not found");
         }
         employeesObj.employees.splice(index, 1);
         // Deleting the employee's evaluations
         const evaluationsObj = await getEvaluationsObj();
         index = evaluationsObj.evaluations.findIndex(
-          (eva) => eva.employee_id === dataID
+          eva => eva.employee_id === dataID
         );
         if (index !== -1) {
           evaluationsObj.evaluations.splice(index, 1);
@@ -175,6 +178,57 @@ export const handler = async (event) => {
         return okNoContentResponse();
       }
       return badRequest(400, "Invalid method");
+      // Evaluation //
+    } else if (dataType === "evaluation") {
+      if (httpMethod === "GET") {
+        if (dataID === "") {
+          return badRequest(400, "Missing parameters");
+        }
+        const evaluationsObj = await getEvaluationsObj();
+        let index = evaluationsObj.evaluations.findIndex(
+          eva => eva.employee_id === dataID
+        );
+        if (index === -1) {
+          const employeesObj = await getEmployeesObj();
+          index = employeesObj.employees.findIndex(
+            emp => emp.employee_id === dataID
+          );
+          if (index === -1) return badRequest(404, "Not found");
+          return okNoContentResponse();
+        }
+        return okResponse(evaluationsObj.evaluations[index]);
+      } else if (httpMethod === "POST") {
+        const parsedBody = JSON.parse(event.body);
+        const employee_id = parsedBody.employee_id || "";
+        const criteria = parsedBody.criteria || [];
+        const is_ready = parsedBody.isready || false;
+
+        if (employee_id === "" || criteria.length === 0) {
+          return badRequest(400, "Missing parameters");
+        }
+
+        const employeesObj = await getEmployeesObj();
+        let empIndex = employeesObj.employees.findIndex(
+          emp => emp.employee_id === employee_id
+        );
+        if (empIndex === -1) return badRequest(404, "Not found");
+
+        const newEvaluation = { employee_id, criteria, is_ready };
+        const evaluationsObj = await getEvaluationsObj();
+        const index = evaluationsObj.evaluations.findIndex(
+          eva => eva.employee_id === employee_id
+        );
+        if (index === -1) {
+          evaluationsObj.evaluations.push(newEvaluation);
+        } else {
+          employeesObj.evaluations[index] = newEvaluation;
+        }
+        await writeJsonToS3("evaluation.json", evaluationsObj);
+        return okResponse(newEvaluation, 201);
+      }
+
+      return badRequest(400, "Invalid method");
+      // Other //
     } else {
       return badRequest();
     }
