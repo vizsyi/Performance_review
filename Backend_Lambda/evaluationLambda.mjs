@@ -221,7 +221,7 @@ export const handler = async event => {
         if (index === -1) {
           evaluationsObj.evaluations.push(newEvaluation);
         } else {
-          employeesObj.evaluations[index] = newEvaluation;
+          evaluationsObj.evaluations[index] = newEvaluation;
         }
         await writeJsonToS3("evaluation.json", evaluationsObj);
         return okResponse(newEvaluation, 201);
