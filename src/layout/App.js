@@ -4,7 +4,20 @@ import EmployeeForm from "./EmployeeForm";
 import Evaluation from "./Evaluation";
 import "./App.css";
 
-function App() {
+import { env } from "./../environment";
+import { useEffect } from "react";
+
+export default function App() {
+  useEffect(() => {
+    fetch(env.API_URL + "/criterion")
+      .then(res => res.json())
+      .then(data => {
+        console.log("Süni", data);
+      })
+      .catch(err => console.log(err));
+  }, []);
+
+  console.log(env);
   return (
     <div className="appcontainer container">
       <Title />
@@ -13,5 +26,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
