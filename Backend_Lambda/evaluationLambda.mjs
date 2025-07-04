@@ -112,8 +112,18 @@ export const handler = async event => {
   const httpMethod = event.requestContext?.http?.method || "unknown";
 
   try {
-    // Criterion
-    if (dataType === "criterion" && httpMethod === "GET") {
+    if (httpMethod === "OPTIONS") {
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+        body: "",
+      };
+      // Criterion
+    } else if (dataType === "criterion" && httpMethod === "GET") {
       const data = Object.assign(
         await readJsonFromS3("criterion.json"),
         await getEmployeesObj()
@@ -198,7 +208,7 @@ export const handler = async event => {
         const parsedBody = JSON.parse(event.body);
         const employee_id = parsedBody.employee_id || "";
         const evaluation = parsedBody.evaluation || [];
-        const is_ready = parsedBody.isready || false;
+        //const is_ready = parsedBody.isready || false;
 
         if (employee_id === "" || evaluation.length === 0) {
           return badRequest(400, "Missing parameters");
@@ -210,7 +220,7 @@ export const handler = async event => {
         );
         if (empIndex === -1) return badRequest(404, "Not found");
 
-        const newEvaluation = { employee_id, evaluation, is_ready };
+        const newEvaluation = { employee_id, evaluation };
         const evaluationsObj = await getEvaluationsObj();
         const index = evaluationsObj.evaluations.findIndex(
           eva => eva.employee_id === employee_id

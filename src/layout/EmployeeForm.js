@@ -1,13 +1,17 @@
 import Loader from "./Loader";
 
 export default function EmployeeForm({
-  isFirstLoading,
   employees,
   employee_id,
+  isFirstLoading,
+  isEvaluationChanged,
+  isSavingEvaluation,
   setEmployee,
+  savingEvaluationFetch,
 }) {
   return (
     <div className="employeeform">
+      <button className="btn btn-info">Új alkalmazott</button>
       {isFirstLoading ? (
         <Loader size={1} />
       ) : (
@@ -28,6 +32,16 @@ export default function EmployeeForm({
           )}
         </select>
       )}
+      <button
+        className="btn btn-success"
+        disabled={!isEvaluationChanged}
+        onClick={savingEvaluationFetch}
+      >
+        {isSavingEvaluation ? "Mentés. . ." : "Értékelés mentése"}
+      </button>
+      <button className="btn btn-danger" disabled={employee_id === ""}>
+        Alkalmazott törlése
+      </button>
     </div>
   );
 }

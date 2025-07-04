@@ -14,6 +14,8 @@ export default function App() {
   const [employee_id, setEmployee_id] = useState("");
   const [criteriaEmployee_id, setCriteriaEmployee_id] = useState("");
   const [isFirstLoading, setFirstLoading] = useState(false);
+  const [isEvaluationChanged, setEvaluationChanged] = useState(false);
+  const [isSavingEvaluation, setSavingEvaluation] = useState(false);
 
   function onSetEvaluation(criterion_id, value) {
     const evaluation = criteria.map(criterion => {
@@ -26,6 +28,7 @@ export default function App() {
       return criterion;
     });
     setCriteria(evaluation);
+    setEvaluationChanged(true);
   }
 
   function sortAndSetEmployees(employees) {
@@ -44,6 +47,8 @@ export default function App() {
     setEmployees(employees);
   }
 
+  //* Fetch subfunctions *//
+
   function setEvaluationAfterFetch(evaluation) {
     const criteriaWithValues = criteria.map(criterion => {
       const evaluationCriterion = evaluation.find(
@@ -56,6 +61,8 @@ export default function App() {
     });
     setCriteria(criteriaWithValues);
   }
+
+  //* Fetch functions *//
 
   async function evaluationFetch(emp_id) {
     const response = await fetch(env.API_URL + "/evaluation/" + emp_id, {
@@ -74,13 +81,42 @@ export default function App() {
       }
     } else {
       console.error("Error:", response.status, response.statusText);
-      // Todo: handling error
     }
   }
 
-  function setEmployee(employee_id) {
-    setEmployee_id(employee_id);
-    evaluationFetch(employee_id);
+  async function savingEvaluationFetch() {
+    if (!isEvaluationChanged) return;
+    const evaluation = criteria.map(criterion => {
+      return {
+        criterion_id: criterion.criterion_id,
+        value: criterion.value,
+      };
+    });
+    const data = {
+      employee_id: employee_id,
+      evaluation: evaluation,
+    };
+
+    setEvaluationChanged(false);
+    setSavingEvaluation(true);
+
+    const response = await fetch(env.API_URL + "/evaluation", {
+      method: "POST",
+      //cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (response.ok) {
+      const respData = await response.json();
+      setEvaluationAfterFetch(respData.data.evaluation);
+      setCriteriaEmployee_id(respData.data.employee_id);
+    } else {
+      console.error("Error:", response.status, response.statusText);
+    }
+
+    setSavingEvaluation(false);
   }
 
   useEffect(function () {
@@ -96,7 +132,7 @@ export default function App() {
         setCriteria(data.data.criteria);
         sortAndSetEmployees(data.data.employees);
       } else {
-        console.log("Error:", response.status, response.statusText);
+        console.error("Error:", response.status, response.statusText);
         // Todo: handling error
       }
       setFirstLoading(false);
@@ -104,7 +140,22 @@ export default function App() {
     firstFetch();
   }, []);
 
-  // Derived states
+  //* Functions calling Fetch functions *//
+
+  function setEmployee(employee_id) {
+    if (
+      isEvaluationChanged &&
+      !window.confirm(
+        "Nem mentetted el a módosításokat.\nBiztosan másik alkalmazottra akarsz váltani?"
+      )
+    )
+      return;
+    setEmployee_id(employee_id);
+    setEvaluationChanged(false);
+    evaluationFetch(employee_id);
+  }
+
+  //* Derived states *//
   const isCriteriaLoading =
     employee_id === "" || employee_id !== criteriaEmployee_id;
 
@@ -112,10 +163,13 @@ export default function App() {
     <div className="appcontainer container">
       <Title />
       <EmployeeForm
-        isFirstLoading={isFirstLoading}
         employees={employees}
         employee_id={employee_id}
+        isFirstLoading={isFirstLoading}
+        isEvaluationChanged={isEvaluationChanged}
+        isSavingEvaluation={isSavingEvaluation}
         setEmployee={setEmployee}
+        savingEvaluationFetch={savingEvaluationFetch}
       />
       {isFirstLoading ? (
         <Loader size={2} />
