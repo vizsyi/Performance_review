@@ -7,8 +7,13 @@ import {
 
 const s3 = new S3Client({ region: "eu-central-1" });
 
-const BUCKET = "webdata-s3";
+const BUCKET = process.env.BUCKET_NAME;
 const FOLDER = "evaluation/";
+
+const HEADERS = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": process.env.ALLOW_ORIGIN,
+};
 
 //* File (bucket object) operations *//
 // 1. Reading JSON file
@@ -59,9 +64,7 @@ async function getEvaluationsObj() {
 function okResponse(data, statusCode = 200) {
   return {
     statusCode: statusCode,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: HEADERS,
     body: JSON.stringify({
       message: "Ok!",
       data: data,
@@ -73,9 +76,7 @@ function okResponse(data, statusCode = 200) {
 function okNoContentResponse() {
   return {
     statusCode: 204,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: HEADERS,
     body: "",
   };
 }
@@ -84,9 +85,7 @@ function okNoContentResponse() {
 function badRequest(statusCode = 400, message = "Invalid request") {
   return {
     statusCode: statusCode,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: HEADERS,
     body: JSON.stringify({
       message: message,
     }),
@@ -97,9 +96,7 @@ function badRequest(statusCode = 400, message = "Invalid request") {
 function postConflict() {
   return {
     statusCode: 409,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: HEADERS,
     body: JSON.stringify({
       message: "Object already exists",
     }),
@@ -235,8 +232,9 @@ export const handler = async event => {
   } catch (error) {
     return {
       statusCode: 500,
+      headers: HEADERS,
       body: JSON.stringify({
-        message: "Error",
+        message: "Error:" + err,
         error: error.message,
       }),
     };
