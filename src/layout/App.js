@@ -15,6 +15,19 @@ export default function App() {
   const [criteriaEmployee_id, setCriteriaEmployee_id] = useState("");
   const [isFirstLoading, setFirstLoading] = useState(false);
 
+  function onSetEvaluation(criterion_id, value) {
+    const evaluation = criteria.map(criterion => {
+      if (criterion.criterion_id === criterion_id) {
+        return {
+          ...criterion,
+          value: value,
+        };
+      }
+      return criterion;
+    });
+    setCriteria(evaluation);
+  }
+
   function sortAndSetEmployees(employees) {
     employees.forEach(employee => {
       employee.display = employee.name + " (" + employee.employee_id + ")";
@@ -31,7 +44,7 @@ export default function App() {
     setEmployees(employees);
   }
 
-  function setEvaluation(evaluation) {
+  function setEvaluationAfterFetch(evaluation) {
     const criteriaWithValues = criteria.map(criterion => {
       const evaluationCriterion = evaluation.find(
         evalCriterion => evalCriterion.criterion_id === criterion.criterion_id
@@ -52,21 +65,20 @@ export default function App() {
     if (response.ok) {
       // Handling data
       if (response.status === 204) {
-        setEvaluation([]);
+        setEvaluationAfterFetch([]);
         setCriteriaEmployee_id(emp_id);
       } else {
         const data = await response.json();
-        setEvaluation(data.data.evaluation);
+        setEvaluationAfterFetch(data.data.evaluation);
         setCriteriaEmployee_id(data.data.employee_id);
       }
     } else {
-      console.log("Error:", response.status, response.statusText);
+      console.error("Error:", response.status, response.statusText);
       // Todo: handling error
     }
   }
 
   function setEmployee(employee_id) {
-    console.log("setEmployee:", employee_id);
     setEmployee_id(employee_id);
     evaluationFetch(employee_id);
   }
@@ -108,7 +120,11 @@ export default function App() {
       {isFirstLoading ? (
         <Loader size={2} />
       ) : (
-        <Evaluation criteria={criteria} isCriteriaLoading={isCriteriaLoading} />
+        <Evaluation
+          criteria={criteria}
+          isCriteriaLoading={isCriteriaLoading}
+          onSetEvaluation={onSetEvaluation}
+        />
       )}
     </div>
   );

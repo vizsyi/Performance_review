@@ -1,4 +1,20 @@
-function EvaluationRow({ index, criterion, isCriteriaLoading }) {
+import StarRating from "./../components/StarRating";
+
+function EvaluationRow({
+  index,
+  criterion,
+  isCriteriaLoading,
+  evaluationMassages,
+  onSetEvaluation,
+}) {
+  function onSetRating(rating) {
+    onSetEvaluation(criterion.criterion_id, rating);
+  }
+
+  function ignoreRate(e) {
+    onSetRating(e.target.checked ? -1 : 0);
+  }
+
   return (
     <tr
       className={
@@ -17,23 +33,46 @@ function EvaluationRow({ index, criterion, isCriteriaLoading }) {
           <input
             type="checkbox"
             checked={!isCriteriaLoading && criterion.value === -1}
+            onChange={ignoreRate}
           />
         </td>
       )}
       <td>
-        {isCriteriaLoading
-          ? ". . ."
-          : criterion.value === -1
-          ? null
-          : criterion.value}
+        {isCriteriaLoading ? (
+          ". . ."
+        ) : criterion.value === -1 ? null : (
+          <StarRating
+            defaultRating={criterion.value}
+            size={24}
+            messages={evaluationMassages}
+            onSetRating={onSetRating}
+          />
+        )}
       </td>
     </tr>
   );
 }
 
-export default function Evaluation({ criteria, isCriteriaLoading }) {
+export default function Evaluation({
+  criteria,
+  isCriteriaLoading,
+  onSetEvaluation,
+}) {
+  // Derived states
+  const isEvaluationReady =
+    !isCriteriaLoading && !criteria.some(item => item.value === 0);
+  const evaluationMassages = [
+    "Gyenge",
+    "Fejlesztendő",
+    "Megfelelő",
+    "Jó",
+    "Kiemelkedő",
+  ];
+
   return (
-    <div className="evaluation">
+    <div
+      className={"evaluation" + (isEvaluationReady ? " evaluation-ready" : "")}
+    >
       <table border="1">
         <thead>
           <tr>
@@ -49,6 +88,8 @@ export default function Evaluation({ criteria, isCriteriaLoading }) {
               index={index + 1}
               criterion={criterion}
               isCriteriaLoading={isCriteriaLoading}
+              evaluationMassages={evaluationMassages}
+              onSetEvaluation={onSetEvaluation}
             />
           ))}
         </tbody>

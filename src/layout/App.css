@@ -28,23 +28,32 @@ h3 {
   font-size: 2.4rem;
 }
 
-button,
+button.btn,
+select,
+input {
+  font-family: inherit;
+  border: none;
+  border-radius: 10rem;
+  padding: 1rem 1.3rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
 select,
 input {
   background-color: #ffebb3;
   color: #5a3e2b;
-  font-family: inherit;
-  border: none;
-  border-radius: 10rem;
-  padding: 1.2rem 3.2rem;
-  font-weight: 700;
+}
+
+select {
+  padding: 1.2rem 2.4rem;
   font-size: 1.8rem;
-  cursor: pointer;
 }
 
 .employeeform button {
   text-transform: uppercase;
-  background-color: #76c7ad;
+  /*background-color: #76c7ad;*/
 }
 
 .evaluation {
@@ -54,8 +63,24 @@ input {
   padding: 4rem 0;
 }
 
+.evaluation-ready,
 .evaluation_row-ready {
   color: #a8e6cf;
+}
+
+.evaluation table thead tr:first-child {
+  font-size: 1.5rem;
+}
+
+.evaluation table td:first-child,
+.evaluation table th:first-child {
+  min-width: 2rem;
+  text-align: center;
+}
+
+.evaluation table td:last-child,
+.evaluation table th:last-child {
+  min-width: 15rem;
 }
 
 input[type="checkbox"] {
