@@ -10,7 +10,25 @@ import Loader from "./Loader";
 
 export default function App() {
   const [criteria, setCriteria] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [employee_id, setEmployee] = useState("");
   const [isFirstLoading, setFirstLoading] = useState(false);
+
+  function sortAndSetEmployees(employees) {
+    employees.forEach(employee => {
+      employee.display = employee.name + " (" + employee.employee_id + ")";
+    });
+    employees.sort((a, b) => {
+      if (a.display < b.display) {
+        return -1;
+      }
+      if (a.display > b.display) {
+        return 1;
+      }
+      return 0;
+    });
+    setEmployees(employees);
+  }
 
   useEffect(function () {
     async function firstFetch() {
@@ -24,6 +42,7 @@ export default function App() {
         //console.log("Süni", data, data.data.criteria);
         // Handling data
         setCriteria(data.data.criteria);
+        sortAndSetEmployees(data.data.employees);
       } else {
         console.log("Error:", response.status, response.statusText);
         // Todo: handling error
@@ -36,7 +55,12 @@ export default function App() {
   return (
     <div className="appcontainer container">
       <Title />
-      <EmployeeForm />
+      <EmployeeForm
+        isFirstLoading={isFirstLoading}
+        employees={employees}
+        employee_id={employee_id}
+        setEmployee={setEmployee}
+      />
       {isFirstLoading ? (
         <Loader size={2} />
       ) : (
