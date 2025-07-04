@@ -1,6 +1,10 @@
-function EvaluationRow({ index, criterion, hasValue }) {
+function EvaluationRow({ index, criterion, isCriteriaLoading }) {
   return (
-    <tr>
+    <tr
+      className={
+        !isCriteriaLoading && criterion.value ? "evaluation_row-ready" : ""
+      }
+    >
       <td>
         <h4>{index}</h4>
       </td>
@@ -10,17 +14,24 @@ function EvaluationRow({ index, criterion, hasValue }) {
       </td>
       {criterion.required ? null : (
         <td>
-          <input type="checkbox" />
+          <input
+            type="checkbox"
+            checked={!isCriteriaLoading && criterion.value === -1}
+          />
         </td>
       )}
-      <td>{hasValue ? criterion.value : ". . ."}</td>
+      <td>
+        {isCriteriaLoading
+          ? ". . ."
+          : criterion.value === -1
+          ? null
+          : criterion.value}
+      </td>
     </tr>
   );
 }
 
-export default function Evaluation({ criteria, hasValue }) {
-  console.log("crit:", criteria);
-
+export default function Evaluation({ criteria, isCriteriaLoading }) {
   return (
     <div className="evaluation">
       <table border="1">
@@ -37,7 +48,7 @@ export default function Evaluation({ criteria, hasValue }) {
               key={criterion.criterion_id}
               index={index + 1}
               criterion={criterion}
-              hasValue={hasValue}
+              isCriteriaLoading={isCriteriaLoading}
             />
           ))}
         </tbody>

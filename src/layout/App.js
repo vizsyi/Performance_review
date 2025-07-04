@@ -11,7 +11,8 @@ import Loader from "./Loader";
 export default function App() {
   const [criteria, setCriteria] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [employee_id, setEmployee] = useState("");
+  const [employee_id, setEmployee_id] = useState("");
+  const [criteriaEmployee_id, setCriteriaEmployee_id] = useState("");
   const [isFirstLoading, setFirstLoading] = useState(false);
 
   function sortAndSetEmployees(employees) {
@@ -30,6 +31,46 @@ export default function App() {
     setEmployees(employees);
   }
 
+  function setEvaluation(evaluation) {
+    const criteriaWithValues = criteria.map(criterion => {
+      const evaluationCriterion = evaluation.find(
+        evalCriterion => evalCriterion.criterion_id === criterion.criterion_id
+      );
+      return {
+        ...criterion,
+        value: evaluationCriterion ? evaluationCriterion.value : 0,
+      };
+    });
+    setCriteria(criteriaWithValues);
+  }
+
+  async function evaluationFetch(emp_id) {
+    const response = await fetch(env.API_URL + "/evaluation/" + emp_id, {
+      method: "GET",
+      cache: "no-store",
+    });
+    if (response.ok) {
+      // Handling data
+      if (response.status === 204) {
+        setEvaluation([]);
+        setCriteriaEmployee_id(emp_id);
+      } else {
+        const data = await response.json();
+        setEvaluation(data.data.evaluation);
+        setCriteriaEmployee_id(data.data.employee_id);
+      }
+    } else {
+      console.log("Error:", response.status, response.statusText);
+      // Todo: handling error
+    }
+  }
+
+  function setEmployee(employee_id) {
+    console.log("setEmployee:", employee_id);
+    setEmployee_id(employee_id);
+    evaluationFetch(employee_id);
+  }
+
   useEffect(function () {
     async function firstFetch() {
       setFirstLoading(true);
@@ -39,7 +80,6 @@ export default function App() {
       });
       if (response.ok) {
         const data = await response.json();
-        //console.log("Süni", data, data.data.criteria);
         // Handling data
         setCriteria(data.data.criteria);
         sortAndSetEmployees(data.data.employees);
@@ -51,6 +91,10 @@ export default function App() {
     }
     firstFetch();
   }, []);
+
+  // Derived states
+  const isCriteriaLoading =
+    employee_id === "" || employee_id !== criteriaEmployee_id;
 
   return (
     <div className="appcontainer container">
@@ -64,7 +108,7 @@ export default function App() {
       {isFirstLoading ? (
         <Loader size={2} />
       ) : (
-        <Evaluation criteria={criteria} hasValue={false} />
+        <Evaluation criteria={criteria} isCriteriaLoading={isCriteriaLoading} />
       )}
     </div>
   );

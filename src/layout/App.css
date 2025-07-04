@@ -50,7 +50,12 @@ input {
 .evaluation {
   background-color: #101420;
   color: #ffebb3;
+  color: #b0c4de;
   padding: 4rem 0;
+}
+
+.evaluation_row-ready {
+  color: #a8e6cf;
 }
 
 input[type="checkbox"] {
