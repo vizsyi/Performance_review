@@ -11,7 +11,13 @@ export default function EmployeeForm({
 }) {
   return (
     <div className="employeeform">
-      <button className="btn btn-info">Új alkalmazott</button>
+      <button
+        className="btn btn-info"
+        data-bs-toggle="modal"
+        data-bs-target="#addEmployeeModal"
+      >
+        Új alkalmazott
+      </button>
       {isFirstLoading ? (
         <Loader size={1} />
       ) : (

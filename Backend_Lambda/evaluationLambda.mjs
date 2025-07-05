@@ -116,7 +116,7 @@ export const handler = async event => {
       return {
         statusCode: 200,
         headers: {
-          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Origin": process.env.ALLOW_ORIGIN,
           "Access-Control-Allow-Methods": "OPTIONS,POST,GET",
           "Access-Control-Allow-Headers": "Content-Type",
         },
@@ -156,7 +156,7 @@ export const handler = async event => {
         employeesObj.employees.push(newEmployee);
         await writeJsonToS3("employee.json", employeesObj);
 
-        return okResponse(newEmployee, 201);
+        return okResponse(employeesObj, 201);
       } else if (httpMethod === "DELETE") {
         if (dataID === "") {
           return badRequest(400, "Missing parameters");
@@ -182,7 +182,7 @@ export const handler = async event => {
         // Saving the employeesObj, too
         await writeJsonToS3("employee.json", employeesObj);
 
-        return okNoContentResponse();
+        return okResponse(employeesObj);
       }
       return badRequest(400, "Invalid method");
       // Evaluation //

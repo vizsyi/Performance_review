@@ -1,12 +1,17 @@
+import { env } from "./../environment";
+import { useEffect, useState } from "react";
+
+//import "bootstrap/dist/js/bootstrap.bundle.min";
+import * as bootstrap from "bootstrap";
+
+import "./App.css";
 //import logo from "./../logo.svg";
+
+import Loader from "./Loader";
 import Title from "./Title";
 import EmployeeForm from "./EmployeeForm";
 import Evaluation from "./Evaluation";
-import "./App.css";
-
-import { env } from "./../environment";
-import { useEffect, useState } from "react";
-import Loader from "./Loader";
+import AddEmployeeModal from "./AddEmployeeModal";
 
 export default function App() {
   const [criteria, setCriteria] = useState([]);
@@ -14,6 +19,8 @@ export default function App() {
   const [employee_id, setEmployee_id] = useState("");
   const [criteriaEmployee_id, setCriteriaEmployee_id] = useState("");
   const [isFirstLoading, setFirstLoading] = useState(false);
+  const [isAddingEmployee, setAddingEmployee] = useState(false);
+  const [conflictEmployeeId, setConflictEmployeeId] = useState("");
   const [isEvaluationChanged, setEvaluationChanged] = useState(false);
   const [isSavingEvaluation, setSavingEvaluation] = useState(false);
 
@@ -31,6 +38,8 @@ export default function App() {
     setEvaluationChanged(true);
   }
 
+  //* Fetch subfunctions *//
+
   function sortAndSetEmployees(employees) {
     employees.forEach(employee => {
       employee.display = employee.name + " (" + employee.employee_id + ")";
@@ -47,8 +56,6 @@ export default function App() {
     setEmployees(employees);
   }
 
-  //* Fetch subfunctions *//
-
   function setEvaluationAfterFetch(evaluation) {
     const criteriaWithValues = criteria.map(criterion => {
       const evaluationCriterion = evaluation.find(
@@ -62,7 +69,43 @@ export default function App() {
     setCriteria(criteriaWithValues);
   }
 
+  function closeAddEmployeeModal() {
+    console.log("closeAddEmployeeModal");
+    const modalElement = document.getElementById("addEmployeeModal");
+    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+    modalInstance?.hide();
+  }
+
   //* Fetch functions *//
+
+  async function addEmployee(employeeId, employeeName) {
+    const data = {
+      employee_id: employeeId.toLowerCase(),
+      name: employeeName,
+    };
+    setAddingEmployee(true);
+    const response = await fetch(env.API_URL + "/employee", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    if (response.ok) {
+      const respData = await response.json();
+      sortAndSetEmployees(respData.data.employees);
+      setAddingEmployee(false);
+      closeAddEmployeeModal();
+      if (!isEvaluationChanged) setEmployee_id(employeeId);
+    } else {
+      if (response.status === 409) {
+        setConflictEmployeeId(employeeId);
+      } else {
+        closeAddEmployeeModal();
+        console.error("Error:", response.status, response.statusText);
+      }
+    }
+  }
 
   async function evaluationFetch(emp_id) {
     const response = await fetch(env.API_URL + "/evaluation/" + emp_id, {
@@ -160,27 +203,34 @@ export default function App() {
     employee_id === "" || employee_id !== criteriaEmployee_id;
 
   return (
-    <div className="appcontainer container">
-      <Title />
-      <EmployeeForm
-        employees={employees}
-        employee_id={employee_id}
-        isFirstLoading={isFirstLoading}
-        isEvaluationChanged={isEvaluationChanged}
-        isSavingEvaluation={isSavingEvaluation}
-        setEmployee={setEmployee}
-        savingEvaluationFetch={savingEvaluationFetch}
-      />
-      {isFirstLoading ? (
-        <Loader size={2} />
-      ) : (
-        <Evaluation
-          criteria={criteria}
-          isCriteriaLoading={isCriteriaLoading}
-          onSetEvaluation={onSetEvaluation}
+    <>
+      <div className="appcontainer container">
+        <Title />
+        <EmployeeForm
+          employees={employees}
+          employee_id={employee_id}
+          isFirstLoading={isFirstLoading}
+          isEvaluationChanged={isEvaluationChanged}
+          isSavingEvaluation={isSavingEvaluation}
+          setEmployee={setEmployee}
+          savingEvaluationFetch={savingEvaluationFetch}
         />
-      )}
-    </div>
+        {isFirstLoading ? (
+          <Loader size={2} />
+        ) : (
+          <Evaluation
+            criteria={criteria}
+            isCriteriaLoading={isCriteriaLoading}
+            onSetEvaluation={onSetEvaluation}
+          />
+        )}
+      </div>
+      <AddEmployeeModal
+        isAddingEmployee={isAddingEmployee}
+        conflictEmployeeId={conflictEmployeeId}
+        addEmployee={addEmployee}
+      />
+    </>
   );
 }
 
