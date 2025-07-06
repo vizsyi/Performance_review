@@ -1,9 +1,6 @@
 import { env } from "./../environment";
 import { useEffect, useState } from "react";
 
-//import "bootstrap/dist/js/bootstrap.bundle.min";
-import * as bootstrap from "bootstrap";
-
 import "./App.css";
 //import logo from "./../logo.svg";
 
@@ -23,6 +20,7 @@ export default function App() {
   const [conflictEmployeeId, setConflictEmployeeId] = useState("");
   const [isEvaluationChanged, setEvaluationChanged] = useState(false);
   const [isSavingEvaluation, setSavingEvaluation] = useState(false);
+  const [addEmpModalShow, setaddEmpModalShow] = useState(false);
 
   function onSetEvaluation(criterion_id, value) {
     const evaluation = criteria.map(criterion => {
@@ -69,14 +67,23 @@ export default function App() {
     setCriteria(criteriaWithValues);
   }
 
-  function closeAddEmployeeModal() {
-    console.log("closeAddEmployeeModal");
-    const modalElement = document.getElementById("addEmployeeModal");
-    const modalInstance = bootstrap.Modal.getInstance(modalElement);
-    modalInstance?.hide();
-  }
-
   //* Fetch functions *//
+  async function getCriteria() {
+    setFirstLoading(true);
+    const response = await fetch(env.API_URL + "/criterion", {
+      method: "GET",
+      cache: "no-store",
+    });
+    if (response.ok) {
+      const data = await response.json();
+      // Handling data
+      setCriteria(data.data.criteria);
+      sortAndSetEmployees(data.data.employees);
+    } else {
+      console.error("Error:", response.status, response.statusText);
+    }
+    setFirstLoading(false);
+  }
 
   async function addEmployee(employeeId, employeeName) {
     const data = {
@@ -91,23 +98,23 @@ export default function App() {
       },
       body: JSON.stringify(data),
     });
+    setAddingEmployee(false);
     if (response.ok) {
       const respData = await response.json();
       sortAndSetEmployees(respData.data.employees);
-      setAddingEmployee(false);
-      closeAddEmployeeModal();
-      if (!isEvaluationChanged) setEmployee_id(employeeId);
+      setaddEmpModalShow(false);
+      if (!isEvaluationChanged) setEmployee(employeeId);
     } else {
       if (response.status === 409) {
         setConflictEmployeeId(employeeId);
       } else {
-        closeAddEmployeeModal();
+        setaddEmpModalShow(false);
         console.error("Error:", response.status, response.statusText);
       }
     }
   }
 
-  async function evaluationFetch(emp_id) {
+  async function getEvaluation(emp_id) {
     const response = await fetch(env.API_URL + "/evaluation/" + emp_id, {
       method: "GET",
       cache: "no-store",
@@ -127,7 +134,7 @@ export default function App() {
     }
   }
 
-  async function savingEvaluationFetch() {
+  async function saveEvaluation() {
     if (!isEvaluationChanged) return;
     const evaluation = criteria.map(criterion => {
       return {
@@ -162,25 +169,24 @@ export default function App() {
     setSavingEvaluation(false);
   }
 
-  useEffect(function () {
+  useEffect(() => {
+    let isMounted = true;
+
     async function firstFetch() {
-      setFirstLoading(true);
-      const response = await fetch(env.API_URL + "/criterion", {
-        method: "GET",
-        cache: "no-store",
-      });
-      if (response.ok) {
-        const data = await response.json();
-        // Handling data
-        setCriteria(data.data.criteria);
-        sortAndSetEmployees(data.data.employees);
-      } else {
-        console.error("Error:", response.status, response.statusText);
-        // Todo: handling error
+      try {
+        await getCriteria();
+      } finally {
+        if (isMounted) {
+          setFirstLoading(false);
+        }
       }
-      setFirstLoading(false);
     }
+
     firstFetch();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   //* Functions calling Fetch functions *//
@@ -195,7 +201,7 @@ export default function App() {
       return;
     setEmployee_id(employee_id);
     setEvaluationChanged(false);
-    evaluationFetch(employee_id);
+    getEvaluation(employee_id);
   }
 
   //* Derived states *//
@@ -213,7 +219,8 @@ export default function App() {
           isEvaluationChanged={isEvaluationChanged}
           isSavingEvaluation={isSavingEvaluation}
           setEmployee={setEmployee}
-          savingEvaluationFetch={savingEvaluationFetch}
+          setaddEmpModalShow={setaddEmpModalShow}
+          saveEvaluation={saveEvaluation}
         />
         {isFirstLoading ? (
           <Loader size={2} />
@@ -226,6 +233,8 @@ export default function App() {
         )}
       </div>
       <AddEmployeeModal
+        show={addEmpModalShow}
+        onHide={() => setaddEmpModalShow(false)}
         isAddingEmployee={isAddingEmployee}
         conflictEmployeeId={conflictEmployeeId}
         addEmployee={addEmployee}

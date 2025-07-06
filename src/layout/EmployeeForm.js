@@ -7,15 +7,12 @@ export default function EmployeeForm({
   isEvaluationChanged,
   isSavingEvaluation,
   setEmployee,
-  savingEvaluationFetch,
+  setaddEmpModalShow,
+  saveEvaluation,
 }) {
   return (
     <div className="employeeform">
-      <button
-        className="btn btn-info"
-        data-bs-toggle="modal"
-        data-bs-target="#addEmployeeModal"
-      >
+      <button className="btn btn-info" onClick={() => setaddEmpModalShow(true)}>
         Új alkalmazott
       </button>
       {isFirstLoading ? (
@@ -41,7 +38,7 @@ export default function EmployeeForm({
       <button
         className="btn btn-success"
         disabled={!isEvaluationChanged}
-        onClick={savingEvaluationFetch}
+        onClick={saveEvaluation}
       >
         {isSavingEvaluation ? "Mentés. . ." : "Értékelés mentése"}
       </button>
