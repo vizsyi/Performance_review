@@ -8,6 +8,7 @@ export default class DataFetch {
     setaddEmpModalShow,
     setEvaluationChanged,
     setAddingEmployee,
+    setDeletingEmployee,
     setSavingEvaluation,
     sortAndSetEmployees,
     setEmployee,
@@ -18,6 +19,7 @@ export default class DataFetch {
     this.setaddEmpModalShow = setaddEmpModalShow;
     this.setEvaluationChanged = setEvaluationChanged;
     this.setAddingEmployee = setAddingEmployee;
+    this.setDeletingEmployee = setDeletingEmployee;
     this.setSavingEvaluation = setSavingEvaluation;
     this.sortAndSetEmployees = sortAndSetEmployees;
     this.setEmployee = setEmployee;
@@ -34,8 +36,6 @@ export default class DataFetch {
 
   async getCriteria(setCriteria, sortAndSetEmployees, setFirstLoading) {
     setFirstLoading(true);
-    console.log("getCriteria");
-    alert("GCrit");
     try {
       const response = await fetch(env.API_URL + "/criterion", {
         method: "GET",
@@ -99,6 +99,34 @@ export default class DataFetch {
       console.error("addEmployee fetch error:", err);
     } finally {
       this.setAddingEmployee(false);
+    }
+  }
+
+  async deleteEmployee(emp_id) {
+    this.setDeletingEmployee(true);
+
+    try {
+      const response = await fetch(env.API_URL + "/employee/" + emp_id, {
+        method: "DELETE",
+        cache: "no-store",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        this.sortAndSetEmployees(data.data.employees);
+        this.setEmployee("");
+      } else {
+        console.error(
+          "deleteEmployee error:",
+          response.status,
+          response.statusText
+        );
+      }
+    } catch (err) {
+      console.error("deleteEmployee fetch error:", err);
+    } finally {
+      this.setDeletingEmployee(false);
     }
   }
 

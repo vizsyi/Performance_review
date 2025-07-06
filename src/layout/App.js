@@ -19,6 +19,7 @@ export default function App() {
   const [criteriaEmployee_id, setCriteriaEmployee_id] = useState("");
   const [isFirstLoading, setFirstLoading] = useState(false);
   const [isAddingEmployee, setAddingEmployee] = useState(false);
+  const [isDeletingEmployee, setDeletingEmployee] = useState(false);
   const [conflictEmployeeId, setConflictEmployeeId] = useState("");
   const [isEvaluationChanged, setEvaluationChanged] = useState(false);
   const [isSavingEvaluation, setSavingEvaluation] = useState(false);
@@ -42,7 +43,8 @@ export default function App() {
 
   function sortAndSetEmployees(employees) {
     employees.forEach(employee => {
-      employee.display = employee.name + " (" + employee.employee_id + ")";
+      employee.display =
+        employee.name + " (" + employee.employee_id.toUpperCase() + ")";
     });
     employees.sort((a, b) => {
       if (a.display < b.display) {
@@ -88,6 +90,7 @@ export default function App() {
       setaddEmpModalShow,
       setEvaluationChanged,
       setAddingEmployee,
+      setDeletingEmployee,
       setSavingEvaluation,
       sortAndSetEmployees,
       setEmployee,
@@ -115,6 +118,12 @@ export default function App() {
     data.current.addEmployee(empId, empName, isEvaluationChanged);
   }
 
+  function deleteEmployee() {
+    window.confirm(
+      "Biztosan törölni akarod az alkalmazottat\nés a hozzá tartozó értékelést?"
+    ) && data.current.deleteEmployee(employee_id);
+  }
+
   function saveEvaluation() {
     data.current.saveEvaluation(
       criteriaEmployee_id,
@@ -137,9 +146,11 @@ export default function App() {
           isFirstLoading={isFirstLoading}
           isEvaluationChanged={isEvaluationChanged}
           isSavingEvaluation={isSavingEvaluation}
+          isDeletingEmployee={isDeletingEmployee}
           setEmployee={setEmployee}
           setaddEmpModalShow={setaddEmpModalShow}
           saveEvaluation={saveEvaluation}
+          deleteEmployee={deleteEmployee}
         />
         {isFirstLoading ? (
           <Loader size={2} />

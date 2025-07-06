@@ -6,9 +6,11 @@ export default function EmployeeForm({
   isFirstLoading,
   isEvaluationChanged,
   isSavingEvaluation,
+  isDeletingEmployee,
   setEmployee,
   setaddEmpModalShow,
   saveEvaluation,
+  deleteEmployee,
 }) {
   return (
     <div className="employeeform">
@@ -42,8 +44,12 @@ export default function EmployeeForm({
       >
         {isSavingEvaluation ? "Mentés. . ." : "Értékelés mentése"}
       </button>
-      <button className="btn btn-danger" disabled={employee_id === ""}>
-        Alkalmazott törlése
+      <button
+        className="btn btn-danger"
+        disabled={employee_id === "" || isDeletingEmployee}
+        onClick={deleteEmployee}
+      >
+        {isDeletingEmployee ? "Törlés . . ." : "Alkalmazott törlése"}
       </button>
     </div>
   );
