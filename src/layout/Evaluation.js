@@ -57,10 +57,10 @@ export default function Evaluation({
   criteria,
   isCriteriaLoading,
   onSetEvaluation,
+  evaluationStat,
 }) {
   // Derived states
-  const isEvaluationReady =
-    !isCriteriaLoading && !criteria.some(item => item.value === 0);
+  const isEvaluationReady = !isCriteriaLoading && evaluationStat.isReady;
   const evaluationMassages = [
     "Gyenge",
     "Fejlesztendő",

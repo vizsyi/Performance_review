@@ -1,10 +1,11 @@
 //import { env } from "./../environment";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import "./App.css";
 //import logo from "./../logo.svg";
 
 import DataFetch from "../data/lambdaAdapter";
+import EvaluationStat from "../service/evaluationStat";
 
 import Loader from "./Loader";
 import Title from "./Title";
@@ -77,6 +78,11 @@ export default function App() {
     [isEvaluationChanged, setEvaluationChanged, setEmployee_id]
   );
 
+  const evaluationStat = useMemo(
+    () => new EvaluationStat(criteria),
+    [criteria]
+  );
+
   const data = useRef();
   const hasInitialized = useRef(false);
 
@@ -138,19 +144,21 @@ export default function App() {
 
   return (
     <>
-      <div className="appcontainer container">
+      <div className="appcontainer">
         <Title />
         <EmployeeForm
           employees={employees}
           employee_id={employee_id}
           isFirstLoading={isFirstLoading}
           isEvaluationChanged={isEvaluationChanged}
+          isCriteriaLOading={isCriteriaLoading}
           isSavingEvaluation={isSavingEvaluation}
           isDeletingEmployee={isDeletingEmployee}
           setEmployee={setEmployee}
           setaddEmpModalShow={setaddEmpModalShow}
           saveEvaluation={saveEvaluation}
           deleteEmployee={deleteEmployee}
+          evaluationStat={evaluationStat}
         />
         {isFirstLoading ? (
           <Loader size={2} />
@@ -159,6 +167,7 @@ export default function App() {
             criteria={criteria}
             isCriteriaLoading={isCriteriaLoading}
             onSetEvaluation={onSetEvaluation}
+            evaluationStat={evaluationStat}
           />
         )}
       </div>
