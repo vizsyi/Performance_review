@@ -73,13 +73,19 @@ export default function Evaluation({
     <div
       className={"evaluation" + (isEvaluationReady ? " evaluation-ready" : "")}
     >
-      <table border="1">
+      <table className="table-bordered">
         <thead>
           <tr>
-            <th></th>
+            <th rowSpan={evaluationStat.hasNoRequired ? "2" : "1"}>#</th>
             <th colSpan="2">Értékelési szempontok</th>
             <th>Felettes értékelése</th>
           </tr>
+          {evaluationStat.hasNoRequired && (
+            <tr>
+              <th></th>
+              <th colSpan="2">Nem értelmezhető</th>
+            </tr>
+          )}
         </thead>
         <tbody>
           {criteria.map((criterion, index) => (

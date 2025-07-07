@@ -91,7 +91,7 @@ select {
   background-color: #101420;
   color: #ffebb3;
   color: #b0c4de;
-  padding: 4rem 0;
+  padding: 3rem 0;
 }
 
 .evaluation-ready,
@@ -103,21 +103,36 @@ select {
   font-size: 1.5rem;
 }
 
+.evaluation thead tr:last-child {
+  border-bottom-width: calc(var(--bs-border-width) * 2 + 2px);
+}
+
 .evaluation table td:first-child,
 .evaluation table th:first-child {
   min-width: 2rem;
   text-align: center;
 }
 
+.evaluation table td:nth-child(3),
+.evaluation table th:nth-child(3) {
+  min-width: 6rem;
+  text-align: center;
+}
+
 .evaluation table td:last-child,
 .evaluation table th:last-child {
-  min-width: 15rem;
+  min-width: 17rem;
+}
+
+.evaluation table td,
+.evaluation table th {
+  padding: 0.3rem 1rem;
 }
 
 input[type="checkbox"] {
   height: 2rem;
   width: 2rem;
-  accent-color: #e5771f;
+  accent-color: #59cfa4;
 }
 
 .stats {

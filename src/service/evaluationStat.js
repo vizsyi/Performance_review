@@ -4,6 +4,7 @@ export default class EvaluationStat {
     this._zeroCount = 0;
     this._pozitiveCount = 0;
     this._sum = 0;
+    this._hasNoRequired = false;
     this._init();
   }
 
@@ -20,6 +21,7 @@ export default class EvaluationStat {
       },
       [0, 0]
     );
+    this._hasNoRequired = this._evaluation.some(ev => ev.required === false);
   }
 
   get isValid() {
@@ -28,6 +30,10 @@ export default class EvaluationStat {
 
   get isReady() {
     return this._zeroCount === 0 && this._pozitiveCount > 0;
+  }
+
+  get hasNoRequired() {
+    return this._hasNoRequired;
   }
 
   get averageText() {
