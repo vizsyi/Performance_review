@@ -27,7 +27,7 @@ export default class EvaluationStat {
   }
 
   get isReady() {
-    return this._zeroCount === 0;
+    return this._zeroCount === 0 && this._pozitiveCount > 0;
   }
 
   get averageText() {
