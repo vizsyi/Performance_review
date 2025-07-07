@@ -1,0 +1,147 @@
+.appcontainer {
+  width: 85%;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  margin: 0 auto;
+}
+
+h1.title {
+  text-align: center;
+  background-color: #e5771f;
+  color: #202b44;
+  font-family: "Monoton";
+  text-transform: uppercase;
+  padding: 1.2rem 0;
+}
+
+.employeeform {
+  background-color: #202b44;
+  padding: 0.8rem 0;
+  min-height: 12rem;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 1.2rem;
+}
+
+.employeeform > div {
+  margin: 0 0.5rem;
+}
+
+.employeeform > div:first-child {
+  flex: 1;
+  margin-left: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.employeeform .stat {
+  width: 15%;
+  min-width: 15rem;
+  flex-shrink: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.8rem;
+  color: #ffebb3;
+  border: solid 2px #ffebb3;
+  border-radius: 1.4rem;
+}
+
+h3 {
+  margin-right: 1.6rem;
+  font-size: 2.4rem;
+}
+
+button.btn,
+select,
+input {
+  font-family: inherit;
+  border: none;
+  border-radius: 10rem;
+  padding: 1rem 1.3rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+select,
+input {
+  background-color: #ffebb3;
+  color: #5a3e2b;
+}
+
+select {
+  padding: 1.2rem 2.4rem;
+  font-size: 1.8rem;
+}
+
+.employeeform button {
+  text-transform: uppercase;
+  /*background-color: #76c7ad;*/
+}
+
+.evaluation {
+  background-color: #101420;
+  color: #ffebb3;
+  color: #b0c4de;
+  padding: 3rem 0;
+}
+
+.evaluation-ready,
+.evaluation_row-ready {
+  color: #a8e6cf;
+}
+
+.evaluation table thead tr:first-child {
+  font-size: 1.5rem;
+}
+
+.evaluation thead tr:last-child {
+  border-bottom-width: calc(var(--bs-border-width) * 2 + 2px);
+}
+
+.evaluation table td:first-child,
+.evaluation table th:first-child {
+  min-width: 2rem;
+  text-align: center;
+}
+
+.evaluation table td:nth-child(3),
+.evaluation table th:nth-child(3) {
+  min-width: 6rem;
+  text-align: center;
+}
+
+.evaluation table td:last-child,
+.evaluation table th:last-child {
+  min-width: 17rem;
+}
+
+.evaluation table td,
+.evaluation table th {
+  padding: 0.3rem 1rem;
+}
+
+input[type="checkbox"] {
+  height: 2rem;
+  width: 2rem;
+  accent-color: #59cfa4;
+}
+
+.stats {
+  background-color: #76c7ad;
+  text-align: center;
+  font-weight: 700;
+  padding: 3.2rem 0;
+}
+
+.modal-content {
+  background: #c2e2fb;
+}

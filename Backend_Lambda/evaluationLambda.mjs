@@ -7,8 +7,13 @@ import {
 
 const s3 = new S3Client({ region: "eu-central-1" });
 
-const BUCKET = "webdata-s3";
+const BUCKET = process.env.BUCKET_NAME;
 const FOLDER = "evaluation/";
+
+const HEADERS = {
+  "Content-Type": "application/json",
+  "Access-Control-Allow-Origin": process.env.ALLOW_ORIGIN,
+};
 
 //* File (bucket object) operations *//
 // 1. Reading JSON file
@@ -59,9 +64,7 @@ async function getEvaluationsObj() {
 function okResponse(data, statusCode = 200) {
   return {
     statusCode: statusCode,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: HEADERS,
     body: JSON.stringify({
       message: "Ok!",
       data: data,
@@ -73,9 +76,7 @@ function okResponse(data, statusCode = 200) {
 function okNoContentResponse() {
   return {
     statusCode: 204,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: HEADERS,
     body: "",
   };
 }
@@ -84,9 +85,7 @@ function okNoContentResponse() {
 function badRequest(statusCode = 400, message = "Invalid request") {
   return {
     statusCode: statusCode,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: HEADERS,
     body: JSON.stringify({
       message: message,
     }),
@@ -97,9 +96,7 @@ function badRequest(statusCode = 400, message = "Invalid request") {
 function postConflict() {
   return {
     statusCode: 409,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: HEADERS,
     body: JSON.stringify({
       message: "Object already exists",
     }),
@@ -115,8 +112,18 @@ export const handler = async event => {
   const httpMethod = event.requestContext?.http?.method || "unknown";
 
   try {
-    // Criterion
-    if (dataType === "criterion" && httpMethod === "GET") {
+    if (httpMethod === "OPTIONS") {
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": process.env.ALLOW_ORIGIN,
+          "Access-Control-Allow-Methods": "OPTIONS,GET,POST,DELETE",
+          "Access-Control-Allow-Headers": "Content-Type",
+        },
+        body: "",
+      };
+      // Criterion
+    } else if (dataType === "criterion" && httpMethod === "GET") {
       const data = Object.assign(
         await readJsonFromS3("criterion.json"),
         await getEmployeesObj()
@@ -149,7 +156,7 @@ export const handler = async event => {
         employeesObj.employees.push(newEmployee);
         await writeJsonToS3("employee.json", employeesObj);
 
-        return okResponse(newEmployee, 201);
+        return okResponse(employeesObj, 201);
       } else if (httpMethod === "DELETE") {
         if (dataID === "") {
           return badRequest(400, "Missing parameters");
@@ -175,7 +182,7 @@ export const handler = async event => {
         // Saving the employeesObj, too
         await writeJsonToS3("employee.json", employeesObj);
 
-        return okNoContentResponse();
+        return okResponse(employeesObj);
       }
       return badRequest(400, "Invalid method");
       // Evaluation //
@@ -200,10 +207,10 @@ export const handler = async event => {
       } else if (httpMethod === "POST") {
         const parsedBody = JSON.parse(event.body);
         const employee_id = parsedBody.employee_id || "";
-        const criteria = parsedBody.criteria || [];
-        const is_ready = parsedBody.isready || false;
+        const evaluation = parsedBody.evaluation || [];
+        //const is_ready = parsedBody.isready || false;
 
-        if (employee_id === "" || criteria.length === 0) {
+        if (employee_id === "" || evaluation.length === 0) {
           return badRequest(400, "Missing parameters");
         }
 
@@ -213,7 +220,7 @@ export const handler = async event => {
         );
         if (empIndex === -1) return badRequest(404, "Not found");
 
-        const newEvaluation = { employee_id, criteria, is_ready };
+        const newEvaluation = { employee_id, evaluation };
         const evaluationsObj = await getEvaluationsObj();
         const index = evaluationsObj.evaluations.findIndex(
           eva => eva.employee_id === employee_id
@@ -221,7 +228,7 @@ export const handler = async event => {
         if (index === -1) {
           evaluationsObj.evaluations.push(newEvaluation);
         } else {
-          employeesObj.evaluations[index] = newEvaluation;
+          evaluationsObj.evaluations[index] = newEvaluation;
         }
         await writeJsonToS3("evaluation.json", evaluationsObj);
         return okResponse(newEvaluation, 201);
@@ -235,8 +242,9 @@ export const handler = async event => {
   } catch (error) {
     return {
       statusCode: 500,
+      headers: HEADERS,
       body: JSON.stringify({
-        message: "Error",
+        message: "Error:" + err,
         error: error.message,
       }),
     };
